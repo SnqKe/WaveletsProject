@@ -15,7 +15,6 @@
 #include <QFileDialog>
 #include <QScrollBar>
 
-
 enum status{ALL, OUTPUT, DWT};
 
 /**
@@ -95,6 +94,7 @@ public slots:
     void updateFineVerticalScrollBar(int val);
     void updateDWTHorizontalScrollBar(int val);
     void updateDWTVerticalScrollBar(int val);
+    void synchroChecked(int state);
 };
 
 #endif // MAINWINDOW_H

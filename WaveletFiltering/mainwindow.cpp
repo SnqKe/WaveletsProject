@@ -211,7 +211,7 @@ void MainWindow::inputDWTDisplayer()
         this->wavelets_spinbox->setEnabled(true);
     }
 
-    if(this->getZoomLevel() == 0 || (this->getZoomLevel() > 0 && ws->getCurrentAnalysisLevel() == 0))
+    if(this->getZoomLevel() == 0 || (this->getZoomLevel() > 0 && !this->synchro_checkbox->isChecked()))
     {
         this->input_DWT_map = QPixmap::fromImage(ws->getInputDWTImage());
         this->input_DWT_map = this->input_DWT_map.scaled(ws->getWidth()*(this->getZoomLevel()+1), ws->getHeight()*(this->getZoomLevel()+1));
@@ -248,7 +248,7 @@ void MainWindow::outputDWTDisplayer()
 
     this->output_DWT_scene->clear();
 
-    if(this->getZoomLevel() == 0 || (this->getZoomLevel() > 0 && ws->getCurrentAnalysisLevel() == 0))
+    if(this->getZoomLevel() == 0 || (this->getZoomLevel() > 0 && !this->synchro_checkbox->isChecked()))
     {
         this->output_DWT_map = QPixmap::fromImage(ws->getOutputDWTImage());
         this->output_DWT_map = this->output_DWT_map.scaled(ws->getWidth()*(this->getZoomLevel()+1), ws->getHeight()*(this->getZoomLevel()+1));
@@ -318,6 +318,7 @@ void MainWindow::connectActions()
     QObject::connect(this->input_DWT_view->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(updateDWTVerticalScrollBar(int)));
     QObject::connect(this->output_DWT_view->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(updateDWTHorizontalScrollBar(int)));
     QObject::connect(this->output_DWT_view->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(updateDWTVerticalScrollBar(int)));
+    QObject::connect(this->synchro_checkbox, SIGNAL(stateChanged(int)), this, SLOT(synchroChecked(int)));
 }
 
 /**
@@ -347,7 +348,7 @@ void MainWindow::analysisModifier(int val)
   */
 void MainWindow::actionLoad()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Charger une image"), "../Images", tr("Images (*.jpg *.bmp *.tif)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Charger une image"), "../Images", tr("Images (*.jpg *.bmp *.png)"));
 
     if(fileName != 0 && fileName.length() > 0)
     {
@@ -362,7 +363,7 @@ void MainWindow::actionLoad()
   */
 void MainWindow::actionSave()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Sauvegarder une image"), "../Images", tr("Images (*.jpg *.bmp *.tif)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Sauvegarder une image"), "../Images", tr("Images (*.jpg *.bmp *.png)"));
 
     if(fileName != 0 && fileName.length() > 0)
     {
@@ -381,10 +382,10 @@ void MainWindow::actionSaveAll()
     information.setText("Sauvegarde des images dans le répertoire ../Images");
     information.setWindowTitle("Information");
     information.exec();
-    ws->saveImage(ws->getSourceImage(), "../Images/input_fine.jpg");
-    ws->saveImage(ws->getInputDWTImage(), "../Images/input_DWT.jpg");
-    ws->saveImage(ws->getOutputDWTImage(), "../Images/output_DWT.jpg");
-    ws->saveImage(ws->getOutputFineImage(), "../Images/output_fine.jpg");
+    ws->saveImage(ws->getSourceImage(), "../Images/input_fine.png");
+    ws->saveImage(ws->getInputDWTImage(), "../Images/input_DWT.png");
+    ws->saveImage(ws->getOutputDWTImage(), "../Images/output_DWT.png");
+    ws->saveImage(ws->getOutputFineImage(), "../Images/output_fine.png");
 }
 
 /**
@@ -483,6 +484,15 @@ void MainWindow::updateDWTVerticalScrollBar(int val)
     }
 }
 
+/**
+ * @brief Change de type de zoom lors d'une synchronisation ou désynchronisation
+ * @param state etat de la checkbox
+ */
+void MainWindow::synchroChecked(int state)
+{
+    if(state == Qt::Checked || state == Qt::Unchecked)
+        this->updateUI(DWT);
+}
 
 /**
   * @brief Accesseur du niveau de zoom
